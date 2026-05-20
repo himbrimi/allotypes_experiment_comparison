@@ -3,11 +3,13 @@ library(dplyr)
 library(tidyr)
 library(data.table)
 
+# set working dir if needed 
+# setwd("C:/Users/Olga/iCloudDrive/Documents/Documents - Olga’s MacBook Pro/work/glycomics/GENOS LAB/PROJECTS/2024_IgG_glycans_with_Anika/20260513_EXP02_vs_EXP03")
 
 # load all three data sources
 
-X <- fread("../2025-04-11-1513Z_Summary.csv")
-X1 <- fread("../2025-04-11-1541Z_Summary.txt")
+X <- fread(file = "./data/raw/2025-04-11-1513Z_Summary.csv")
+X1 <- fread("./data/raw/2025-04-11-1541Z_Summary.txt")
 
 colnames(X1)[1] <- "Sample"
 colnames(X1)[2] <- "Charge"
@@ -43,7 +45,7 @@ X_ <- merge(X, X1)
 
 ## load X2
 
-X2 <- fread("../2025-04-28-1117Z_Summary.txt")
+X2 <- fread("./data/raw/2025-04-28-1117Z_Summary.txt")
 ## check if sample list is the same
 
 setdiff(unique(X$Sample), unique(X2$Sample))
@@ -77,7 +79,7 @@ X <- X %>%
   relocate(Sample)
 
 ## add sample info
-samples <- fread("../EXP02_samples.csv")
+samples <- fread("./data/raw/EXP02_samples.csv")
 
 X <- X %>%
   mutate(genos_id = gsub("_2-.*$", "", Sample))
@@ -88,4 +90,4 @@ X <- X %>%
   relocate(Sample, Charge,genos_id,allotype,construct)
 
 
-fwrite(X, file = "./output/20260515_EXP02_combined.csv")
+fwrite(X, file = "./data/processed/EXP02_curation/20260515_EXP02_combined.csv")
