@@ -23,32 +23,20 @@ library(data.table)
 #
 
 
-load("./data/raw/00-X-exp03.RData")
+load("./data/raw/02-X_exp02.RData")
 
 # depends on which EXP we are processing I might create HC and LC columns in a different way
 
-# X <- X %>%
-#   rename(LC = construct) %>%
-#   mutate(HC = gsub("-.*$", "", type))
-
-# X[X$narea == 0,]$narea <- NA
-
 X <- X %>%
-  mutate(HC = ifelse(grepl("stand", Sample), "stand", 
-                     ifelse(grepl("blank", Sample), "blank", gsub("-.*$","", Sample))))
-X <- X %>%
-  mutate(genos_id = ifelse(grepl("stand", Sample), "stand", 
-                     ifelse(grepl("blank", Sample), "blank", gsub("_.*$","", Sample))))
+  rename(LC = construct) %>%
+  mutate(HC = gsub("-.*$", "", type))
 
-X <- X %>%
-  mutate(LC = ifelse(grepl("stand", genos_id), "stand", 
-                     ifelse(grepl("blank", genos_id), "blank", gsub("^.*-","", genos_id))))
-  
+X[X$narea == 0,]$narea <- NA
 
 
 # plot according to the sample type
 
-p <- ggplot(data=X, aes(x=genos_id, y=narea))
+p <- ggplot(data=X, aes(x=type, y=narea))
 
 print(
   p
@@ -59,4 +47,21 @@ print(
   
 )
 
+X <- X %>%
+  select(-allotype, -num, -genos_id, -cond)
+save(X, file = "./data/processed/00-X-exp02_v1.RData")
 
+
+X <- X %>%
+  filter(!(grepl("stand", type))) 
+
+X <- X %>%
+  filter(!(grepl("blank", type))) 
+
+X <- X %>%
+  mutate(type = paste(HC, LC, sep = "-"))
+
+X <- X %>%
+  filter(is.na())
+
+save(X, file = "./data/processed/00-X-exp02_v1_1_without_stands.RData")
