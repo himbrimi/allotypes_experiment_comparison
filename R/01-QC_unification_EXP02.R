@@ -23,7 +23,7 @@ library(data.table)
 #
 
 
-load("./data/raw/02-X_exp02.RData")
+load("./data/raw/01-X-exp02.RData")
 
 # depends on which EXP we are processing I might create HC and LC columns in a different way
 
@@ -61,7 +61,6 @@ X <- X %>%
 X <- X %>%
   mutate(type = paste(HC, LC, sep = "-"))
 
-X <- X %>%
-  filter(is.na())
+
 
 save(X, file = "./data/processed/00-X-exp02_v1_1_without_stands.RData")

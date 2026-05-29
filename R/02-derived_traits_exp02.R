@@ -43,7 +43,7 @@ derived_traits <- function(data){
     mutate(G0 = H3N3F1 + H3N4F1 + H3N5F1) %>%
     mutate(G = H4N4F1 + H4N5F1+H5N4F1+H5N4F2+H5N5F1+H6N3F1) %>%
     mutate(S = H4N4F1S1 + H5N4F1S1 + H5N4F1S2 + H6N3F1S1 + H4N5F1S1 + H5N4F2S1) %>%
-    mutate(M = H4N2+H5N2+H6N2) %>%
+    mutate(M = H5N2+H6N2) %>%
     mutate(B = H3N5F1+H4N5F1+H5N5F1 +  H4N5F1S1) %>%
     mutate(AntennaryF = H5N4F2 +  H5N4F2S1) %>%
     mutate(H = H5N3F1 + H6N3F1 + H6N3F1S1)
@@ -89,7 +89,7 @@ print(
 
 X <- X_l
 
-save(X, file="./data/processed/03-X-EXP03.RData")
+save(X, file="./data/processed/02-X-EXP02.RData")
 
 
 

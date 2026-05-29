@@ -88,7 +88,7 @@ print(
 
 X <- X_l
 
-save(X, file="./data/processed/03-X-EXP03.RData")
+save(X, file="./data/processed/02-X-EXP03.RData")
 
 
 

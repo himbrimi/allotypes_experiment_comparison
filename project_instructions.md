@@ -25,8 +25,8 @@ Both input files are pre-curated long-format datasets (total area normalised, co
 
 | File | Experiment |
 |---|---|
-| `data/raw/00-X-exp03.RData` | EXP03 |
-| `data/raw/02-X_exp02.RData` | EXP02 |
+| `data/processed/00-X-exp02_v1_1_without_stands.RData` | EXP02 |
+| `data/processed/00-X-exp03_v1_1_without_stands.RData` | EXP03 |
 
 ---
 
@@ -38,11 +38,22 @@ Compare the glycoforms present in the two curated datasets and document all diff
 
 **Output:** a table listing, for each glycoform that differs: its status in each experiment, which traits are affected, and the expected directional bias on those traits. Classify traits as unaffected (directly comparable) or affected (inter-experiment comparison requires explicit bias notation).
 
-*To be completed after inspecting the RData files.*
+**Confirmed discrepancies (from RData inspection):**
+
+| Glycoform | EXP02 | EXP03 | Affected traits | Directional bias |
+|---|---|---|---|---|
+| H4N5F1S1 | Present | Absent (could not be reliably quantified) | B, S | B and S slightly higher in EXP02 |
+| H5N4F2S1 | Present | Absent (excluded, S/N < 9) | S, AntennaryF | S and AntennaryF slightly higher in EXP02 |
+| H4N2 | Absent (integration error; removed globally) | Present | M | M slightly lower in EXP02 |
+
+Both datasets renormalized to sum = 100 per sample per peptide. EXP03 contains 19 glycoforms; EXP02 contains 20.
+
+**Traits unaffected by discrepancies:** G0, G, A1, H (directly comparable across experiments).
+**Traits affected:** S, B, AntennaryF, M (inter-experiment comparison requires explicit bias notation).
 
 ### Step 2 — Derive traits per experiment separately
 
-Calculate all 9 traits independently for EXP02 and EXP03 using experiment-specific glycoform availability. Do not apply a common restricted definition — each experiment uses the best available data for that dataset.
+Calculate all 8 traits independently for EXP02 and EXP03 using experiment-specific glycoform availability. Do not apply a common restricted definition — each experiment uses the best available data for that dataset.
 
 ### Step 3 — ART-ANOVA per experiment separately
 
@@ -52,7 +63,7 @@ Aligned Rank Transform ANOVA using the `ARTool` package, run independently for e
 art(trait ~ HC * LC, data = df)
 ```
 
-Tests HC main effect, LC main effect, and HC×LC interaction for each trait (3 tests × 9 traits = 27 tests per experiment).
+Tests HC main effect, LC main effect, and HC×LC interaction for each trait (3 tests × 8 traits = 24 tests per experiment).
 
 **Known caveat:** ART interaction tests can have inflated type I error when main effects are very large (Elkin et al. 2021). If a dominant main effect is found, cross-validate the interaction using standard parametric two-way ANOVA.
 
@@ -60,23 +71,24 @@ Tests HC main effect, LC main effect, and HC×LC interaction for each trait (3 t
 
 ### Step 4 — Inter-experiment comparison (descriptive)
 
-For traits unaffected by glycoform discrepancies (G0, M, A1, H), compute Spearman ρ between EXP02 and EXP03 antibody means across the 8 antibodies as a reproducibility check. No pass/fail threshold; ρ reported as descriptive evidence of consistency.
+For traits unaffected by glycoform discrepancies (G0, G, M, A1, H), compute Spearman ρ between EXP02 and EXP03 antibody means across the 8 antibodies as a reproducibility check. No pass/fail threshold; ρ reported as descriptive evidence of consistency.
 
-For traits affected by missing glycoforms (S, G, B, Fuc, AntennaryF), note the directional bias explicitly — do not compute ρ as a comparability measure.
+For traits affected by missing glycoforms (S, B, AntennaryF), note the directional bias explicitly — do not compute ρ as a comparability measure.
 
 Spearman ρ results are intended for internal use and supplementary material; not a primary paper result.
 
 ### Step 5 — FDR correction
 
-Apply Benjamini-Hochberg FDR separately within each experiment across all 27 tests (9 traits × 3 effects: HC, LC, HC×LC). Significance threshold: q < 0.05.
+Apply Benjamini-Hochberg FDR separately within each experiment across all 24 tests (8 traits × 3 effects: HC, LC, HC×LC). Significance threshold: q < 0.05.
 
 ### Step 6 — Visualisation
 
-To be planned after Steps 2–5 are implemented. Anticipated outputs:
-- Heatmap of trait means per experiment (rows = traits, columns = 8 antibodies; annotated by HC and LC)
-- Per-trait bar charts with individual data points for significant findings, experiments shown separately
-- PCA on full trait matrix coloured by HC and LC
-- Supplementary reproducibility scatter plots (EXP02 vs EXP03 per trait with ρ) for unaffected traits
+Implemented in `04-combined_effects_plot.R`. Emmeans from ART models plotted for both experiments on the same graph, with experiment encoded as line type (EXP02 solid, EXP03 dashed) and colour lightness. Two plot types produced:
+
+- **HC marginal means** (pooled across LC) — `04-combined-HC-effect.pdf`
+- **LC marginal means** (pooled across HC) — `04-combined-LC-effect.pdf`
+
+HC×LC cell means code is present in the script but commented out — no HC×LC interactions were significant after BH-FDR correction in either experiment.
 
 ### Step 7 — Synthesis
 
@@ -90,19 +102,20 @@ Effects significant in only one experiment are reported as exploratory.
 
 ## Trait Definitions
 
-Nine derived traits, calculated independently per experiment using available glycoforms.
+Eight derived traits, calculated independently per experiment using available glycoforms.
 
-| Label | Name | Formula |
-|---|---|---|
-| G0 | Agalactosylation | H3N3F1 + H3N4F1 + H3N5F1 + H5N3F1 |
-| G | Galactosylation | H4N4F1 + H4N5F1 + H5N4F1 + H5N4F2 + H5N5F1 + H6N3F1 |
-| S | Sialylation | H4N4F1S1 + H5N4F1S1 + H5N4F1S2 + H6N3F1S1 (+ any additional sialylated structures present per experiment — to be confirmed in Step 1) |
-| M | High Mannose | H4N2 + H5N2 + H6N2 |
-| B | Bisection | H3N5F1 + H4N5F1 + H5N5F1 (+ any additional bisecting structures present per experiment — to be confirmed in Step 1) |
-| Fuc | Fucosylation | All fucosylated structures present per experiment (see scripts; to be confirmed in Step 1) |
-| AntennaryF | Antennary fucosylation | H5N4F2 (+ any antennary-fucosylated sialylated structures present per experiment — to be confirmed in Step 1) |
-| A1 | Monoantennary | H3N3F1 |
-| H | Hybrid | H5N3F1 + H6N3F1 + H6N3F1S1 |
+| Label | Name | EXP03 | EXP02 additions |
+|---|---|---|---|
+| A1 | Monoantennary | H3N3F1 | — |
+| G0 | Agalactosylation | H3N3F1 + H3N4F1 + H3N5F1 | — |
+| G | Galactosylation | H4N4F1 + H4N5F1 + H5N4F1 + H5N4F2 + H5N5F1 + H6N3F1 | — |
+| S | Sialylation | H4N4F1S1 + H5N4F1S1 + H5N4F1S2 + H6N3F1S1 | + H4N5F1S1 + H5N4F2S1 |
+| M | High Mannose | H4N2 + H5N2 + H6N2 | − H4N2 (integration error) |
+| B | Bisection | H3N5F1 + H4N5F1 + H5N5F1 | + H4N5F1S1 |
+| AntennaryF | Antennary fucosylation | H5N4F2 | + H5N4F2S1 |
+| H | Hybrid | H5N3F1 + H6N3F1 + H6N3F1S1 | — |
+
+Fucosylation trait dropped: all non-high-mannose structures in this dataset carry core fucose, making Fuc perfectly collinear with 100 − M.
 
 ---
 
@@ -112,12 +125,16 @@ Nine derived traits, calculated independently per experiment using available gly
 
 | Glycan | Excluded from | Reason |
 |---|---|---|
-| H4N3F1 | G0, G, B (retained in Fuc) | Co-eluting isomer mixture |
-| H4N4F2 | AntennaryF, G (retained in Fuc) | Antennary fucose position unconfirmed |
+| H4N3F1 | G0, G, B | Co-eluting isomer mixture |
+| H4N4F2 | G, AntennaryF | Antennary fucose position unconfirmed |
 
 ### Experiment-specific exclusions
 
-To be documented after Step 1 audit.
+| Glycoform | EXP02 | EXP03 | Reason |
+|---|---|---|---|
+| H4N5F1S1 | Present | Absent | Could not be reliably quantified |
+| H5N4F2S1 | Present | Excluded | S/N = 5.5, below threshold of 9 |
+| H4N2 | Absent | Present | Integration error in EXP02 (detected in IgGIF1 only, inconsistent with QC); removed globally |
 
 ---
 
@@ -142,12 +159,12 @@ To be documented after Step 1 audit.
 ## Current Status
 
 - [x] Analysis plan defined
-- [x] Trait definitions finalised per experiment
-- [x] Glycoform discrepancies between experiments documented
-- [x] Pre-curated RData inputs identified
-- [ ] Step 2: Derive traits per experiment
-- [ ] Step 3: ART-ANOVA per experiment
-- [ ] Step 4: Inter-experiment comparison
-- [ ] Step 5: BH-FDR correction
-- [ ] Step 6: Visualisation
+- [x] Trait definitions finalised per experiment (8 traits; Fuc dropped)
+- [x] Glycoform discrepancies between experiments documented (Step 1 complete)
+- [x] Pre-curated RData inputs identified, cleaned, and verified
+- [x] Step 2: Derive traits per experiment (script ready)
+- [x] Step 3: ART-ANOVA per experiment (results: `03artanovaEXP02.csv`, `03artanovaEXP03.csv`)
+- [x] Step 4: Inter-experiment comparison — descriptive means per HC×LC combination (`20260528comparing_EXP02_EXP03.csv`)
+- [x] Step 5: BH-FDR correction (applied within each experiment across 24 tests; `p_adj` and `sign` columns in ART-ANOVA output files)
+- [x] Step 6: Visualisation — HC and LC marginal emmeans, both experiments combined (`04-combined_effects_plot.R`); HC×LC plots omitted — no significant interactions in either experiment
 - [ ] Step 7: Synthesis
