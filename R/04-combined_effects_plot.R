@@ -194,3 +194,162 @@ ggplot(em_HC, aes(x = HC, y = emmean, group = experiment,
   base_theme
 
 dev.off()
+
+
+# ------------------------------------------------------------------------------
+# Plot 4 — correlation between EXP02 and EXP02
+# ------------------------------------------------------------------------------
+
+X02_m <- X02 %>%
+  summarise(across(where(is.numeric), mean), .by = c(glycan, LC, HC)) %>%
+  mutate(experiment = "EXP02")
+
+X03_m <- X03 %>%
+  summarise(across(where(is.numeric), mean), .by = c(glycan, LC, HC)) %>%
+  mutate(experiment = "EXP03")
+
+
+X_m <- bind_rows(X02_m, X03_m)
+
+X_mw <- X_m %>%
+  pivot_wider(names_from = experiment, values_from = narea)
+
+X_mw <- X_mw %>%
+  mutate(genotype = paste(HC, LC, sep = "-"))
+
+#pdf("./output/figures/04-combined-HC-effect.pdf", width = 12, height = 14)
+
+glycan_colours <- c(
+  "Agalactosylation"       = "#E69F00",
+  "Galactosylation"        = "#56B4E9",
+  "Sialylation"            = "#009E73",
+  "Bisection"              = "#F0E442",
+  "High Mannose"           = "#0072B2",
+  "Antennary fucosylation" = "#D55E00",
+  "Monoantennary"          = "#CC79A7",
+  "Hybrid"                 = "#000000"
+)
+
+
+hc_shapes <- c(Y = 21, YA = 22, YF = 23, YI = 24)
+
+pdf("./output/figures/04-EXP02_vs_EXP03_traits.pdf", width = 12, height = 14)
+p <- ggplot(X_mw, aes(x = EXP02, y = EXP03))
+
+print(
+  p 
+    # WT: filled symbols
+    + geom_point(
+      data = subset(X_mw, LC == "WT"),
+      aes(color = glycan, fill = glycan, shape = HC),
+      size = 3, stroke = 0.8
+    )
+  # NO: hollow symbols (same border colour, fill = NA)
+    + geom_point(
+      data = subset(X_mw, LC == "NO"),
+      aes(color = glycan, shape = HC),
+      fill = NA,
+      size = 3, stroke = 0.8
+    )
+  # Invisible points to inject an LC legend
+   +  geom_point(aes(alpha = LC), shape = NA, size = 0)
+  
+  # Scales
+    + scale_shape_manual(name = "HC", values = hc_shapes)
+    + scale_color_manual(
+      name   = "Trait",
+      values = glycan_colours,
+      guide  = guide_legend(
+        override.aes = list(shape = 21, size = 3,
+                            fill  = unname(glycan_colours))))
+    + scale_fill_manual(values = glycan_colours, guide = "none")
+    + scale_alpha_manual(
+      name   = "LC",
+      values = c(WT = 1, NO = 1),       # alpha has no visual effect
+      guide  = guide_legend(
+        override.aes = list(
+          shape    = c(21, 21),
+          color    = c("grey40", "grey40"),
+          fill     = c("grey40", NA),   # WT filled, NO hollow
+          size     = 3,
+          stroke   = 0.8,
+          alpha    = 1
+        )
+      )
+    )
+    + labs(
+      x = "Mean normalised area EXP02 (%)",
+      y = "Mean normalised area EXP03 (%)"
+    )
+      + theme_bw(base_size = 11) 
+      + theme(legend.key = element_rect(fill = NA)) 
+  ## identity line
+   + geom_abline(intercept = 0, slope = 1, linetype = "dotted", color = "grey60", linewidth = 0.5)
+)
+
+dev.off()
+
+#### separately per IgG heavy chain
+
+pdf("./output/figures/04-EXP02_vs_EXP03_traits_per_HC.pdf", width = 12, height = 12)
+
+
+p <- ggplot(X_mw, aes(x = EXP02, y = EXP03))
+
+print(
+  p 
+  # WT: filled symbols
+  + geom_point(
+    data = subset(X_mw, LC == "WT"),
+    aes(color = glycan, fill = glycan, shape = LC),
+    size = 3, stroke = 0.8
+  )
+  # NO: hollow symbols (same border colour, fill = NA)
+  + geom_point(
+    data = subset(X_mw, LC == "NO"),
+    aes(color = glycan, shape = LC),
+    fill = NA,
+    size = 3, stroke = 0.8
+  )
+  + facet_wrap(~HC, scales="free", ncol=2)
+  + scale_color_manual(values = glycan_colours)
+  # Invisible points to inject an LC legend
+  #+  geom_point(aes(alpha = LC), shape = NA, size = 0)
+  
+  # Scales
+  # + scale_shape_manual(name = "HC", values = hc_shapes)
+  # + scale_color_manual(
+  #   name   = "Trait",
+  #   values = glycan_colours,
+  #   guide  = guide_legend(
+  #     override.aes = list(shape = 21, size = 3,
+  #                         fill  = unname(glycan_colours))))
+  # + scale_fill_manual(values = glycan_colours, guide = "none")
+  # + scale_alpha_manual(
+  #   name   = "LC",
+  #   values = c(WT = 1, NO = 1),       # alpha has no visual effect
+  #   guide  = guide_legend(
+  #     override.aes = list(
+  #       shape    = c(21, 21),
+  #       color    = c("grey40", "grey40"),
+  #       fill     = c("grey40", NA),   # WT filled, NO hollow
+  #       size     = 3,
+  #       stroke   = 0.8,
+  #       alpha    = 1
+  #     )
+  #   )
+  # )
+  + labs(
+    x = "Mean normalised area EXP02 (%)",
+    y = "Mean normalised area EXP03 (%)"
+  )
+  + theme_bw(base_size = 11) 
+  #+ theme(legend.key = element_rect(fill = NA)) 
+  ## identity line
+  + geom_abline(intercept = 0, slope = 1, linetype = "dotted", color = "grey60", linewidth = 0.5)
+)
+dev.off()
+
+
+
+
