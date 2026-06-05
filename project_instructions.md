@@ -229,10 +229,10 @@ H5N4F2S1: removed from both experiments — present in only one HC type per expe
 - [x] H5N4F2S1 removed from both experiments (present in one HC type only per experiment)
 - [x] Charge-state integration summaries produced (`docs/EXP03_charge_state_summary_v2.xlsx`, `docs/EXP02_charge_state_summary.xlsx`)
 - [x] Glycoform discrepancies between experiments documented and updated (Step 1)
-- [ ] **Step 0: Renormalisation scripts** — `R/00-normalise_EXP03.R` and `R/00-normalise_EXP02.R` to be written; new RData files to be generated
-- [ ] Step 2: Derive traits — to be rerun for both experiments after Step 0
-- [ ] Step 3: ART-ANOVA — to be rerun for both experiments after Step 0
-- [ ] Step 4: Inter-experiment comparison — to be rerun after Step 0
-- [ ] Step 5: BH-FDR correction — to be rerun after Step 0
-- [ ] Step 6: Visualisation — to be rerun after Step 0
+- [x] **Step 0: Renormalisation scripts written and executed** — `R/00-normalise_EXP03.R` and `R/00-normalise_EXP02.R`; new RData files generated; supersede `01-QC_unification_*.R`
+- [ ] Step 2: Derive traits — to be rerun for both experiments (`R/01-derived_traits.R`, `R/01-derived_traits_exp02.R`)
+- [ ] Step 3: ART-ANOVA — to be rerun for both experiments (`R/02-derived_traits_stats.R`)
+- [ ] Step 4: Inter-experiment comparison — to be rerun
+- [ ] Step 5: BH-FDR correction — to be rerun
+- [ ] Step 6: Visualisation — to be rerun (`R/03-combined_effects_plot.R`, `R/04_trait_heatmap.R`)
 - [ ] Step 7: Synthesis

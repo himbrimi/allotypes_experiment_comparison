@@ -68,8 +68,8 @@ HC types map to analysed glycopeptides as follows: Y → IgGI1, YA → IgGIA1, Y
 │       ├── 20260528-comparing_EXP02_EXP03.csv  # Inter-experiment comparison (flat)
 │       └── 20260528-comparing_EXP02_EXP03.xlsx # Inter-experiment comparison (with difference formulas)
 ├── R/
-│   ├── 00-normalise_EXP02.R                    # Normalisation, QC, unification EXP02 (new)
-│   ├── 00-normalise_EXP03.R                    # Normalisation, QC, unification EXP03 (new)
+│   ├── 00-normalise_EXP02.R                    # Normalisation, QC, unification EXP02
+│   ├── 00-normalise_EXP03.R                    # Normalisation, QC, unification EXP03
 │   ├── 01-QC_unification_EXP02.R               # Superseded by 00-normalise_EXP02.R (archived)
 │   ├── 01-QC_unification_EXP03.R               # Superseded by 00-normalise_EXP03.R (archived)
 │   ├── 01-derived_traits_exp02.R               # Analyte curation and trait derivation EXP02
@@ -85,7 +85,7 @@ HC types map to analysed glycopeptides as follows: Y → IgGI1, YA → IgGIA1, Y
 
 ### Step 0 — Normalisation, QC, contamination removal, and unification (`00-normalise_EXP02.R`, `00-normalise_EXP03.R`)
 
-Both LaCyTools source files were manually corrected for charge-state integration errors (see Source Corrections below). Each corrected CSV is read; charge states summed per glycopeptide per sample; NAs replaced with 0; blanks and standards removed; absolute areas renormalised to sum = 100 per sample per peptide; contamination flagged and removed (glycopeptide signal in samples whose HC type does not match that peptide); peptide × glycan grid completed; globally absent structures removed; HC and LC columns derived. QC plot saved as PDF. Output: `00-X-exp02_without_stands.RData` and `00-X-exp03_without_stands.RData`.
+Both LaCyTools source files were manually corrected for charge-state integration errors (see Source Corrections below). Each corrected CSV is read; charge states summed per glycopeptide per sample; blanks and standards removed; absolute areas renormalised to sum = 100 per sample per peptide; contamination flagged and removed; peptide × glycan grid completed; globally absent structures removed; HC and LC columns derived. QC plot saved as PDF. Output: `00-X-exp02_without_stands.RData` and `00-X-exp03_without_stands.RData`.
 
 These scripts incorporate and supersede the previously separate `01-QC_unification_EXP02.R` and `01-QC_unification_EXP03.R`.
 
@@ -189,9 +189,8 @@ Reproducibility managed with `renv`. Run `renv::restore()` to install the correc
 - [x] H5N4F2S1 removed from both experiments (present in one HC type only per experiment)
 - [x] Charge-state integration audit tables produced (`docs/EXP03_charge_state_summary_v2.xlsx`, `docs/EXP02_charge_state_summary.xlsx`)
 - [x] Inter-experiment glycoform discrepancies documented (Step 1 prerequisite)
-- [x] Step 0 scripts written (`R/00-normalise_EXP02.R`, `R/00-normalise_EXP03.R`); supersede `01-QC_unification_*.R`
-- [ ] Step 0: Run normalisation scripts to generate new RData files for both experiments
-- [ ] Step 1: Trait derivation — to be rerun after Step 0 (`R/01-derived_traits.R`, `R/01-derived_traits_exp02.R`)
-- [ ] Step 2: ART-ANOVA, BH-FDR, inter-experiment comparison — to be rerun after Step 0 (`R/02-derived_traits_stats.R`)
-- [ ] Step 3: Visualisation — to be rerun after Step 0 (`R/03-combined_effects_plot.R`, `R/04_trait_heatmap.R`)
+- [x] Step 0 scripts written and executed — `R/00-normalise_EXP02.R`, `R/00-normalise_EXP03.R`; new RData files generated; supersede `01-QC_unification_*.R`
+- [ ] Step 1: Trait derivation — to be rerun (`R/01-derived_traits.R`, `R/01-derived_traits_exp02.R`)
+- [ ] Step 2: ART-ANOVA, BH-FDR, inter-experiment comparison — to be rerun (`R/02-derived_traits_stats.R`)
+- [ ] Step 3: Visualisation — to be rerun (`R/03-combined_effects_plot.R`, `R/04_trait_heatmap.R`)
 - [ ] Synthesis
