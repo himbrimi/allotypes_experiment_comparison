@@ -230,9 +230,7 @@ H5N4F2S1: removed from both experiments — present in only one HC type per expe
 - [x] Charge-state integration summaries produced (`docs/EXP03_charge_state_summary_v2.xlsx`, `docs/EXP02_charge_state_summary.xlsx`)
 - [x] Glycoform discrepancies between experiments documented and updated (Step 1)
 - [x] **Step 0: Renormalisation scripts written and executed** — `R/00-normalise_EXP03.R` and `R/00-normalise_EXP02.R`; new RData files generated; supersede `01-QC_unification_*.R`
-- [ ] Step 2: Derive traits — to be rerun for both experiments (`R/01-derived_traits.R`, `R/01-derived_traits_exp02.R`)
-- [ ] Step 3: ART-ANOVA — to be rerun for both experiments (`R/02-derived_traits_stats.R`)
-- [ ] Step 4: Inter-experiment comparison — to be rerun
-- [ ] Step 5: BH-FDR correction — to be rerun
-- [ ] Step 6: Visualisation — to be rerun (`R/03-combined_effects_plot.R`, `R/04_trait_heatmap.R`)
+- [x] **Step 2: Derive traits** — rerun for both experiments (`R/01-derived_traits.R`, `R/01-derived_traits_exp02.R`); outputs: `data/processed/01-X-EXP02.RData`, `data/processed/01-X-EXP03.RData`
+- [x] **Step 3: ART-ANOVA + BH-FDR + emmeans** — rerun for both experiments (`R/02-derived_traits_stats.R`); results: `output/tables/02-EXP02-art-anova.csv`, `output/tables/02-EXP02_data_averages.csv`, `output/tables/02-EXP03-art-anova.csv`, `output/tables/02-EXP03_data_averages.csv`
+- [x] **Steps 4 + 6: Inter-experiment comparison and visualisation** — `R/03-combined_effects_plot.R` and `R/04_trait_heatmap.R` run; combined emmeans plots and scatter comparisons produced; heatmaps produced
 - [ ] Step 7: Synthesis

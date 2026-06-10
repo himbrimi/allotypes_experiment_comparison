@@ -12,10 +12,10 @@ library(tidyverse)
 library(pheatmap)
 
 ## load data
-load("./data/processed/03-X_dt_EXP02.RData") # loads traits_exp02
+load("./data/processed/02-X_dt_EXP02.Rdata") # loads traits_exp02
 traits_exp02 <- X_dt
 
-load("./data/processed/03-X_dt.RData") # loads traits_exp03
+load("./data/processed/02-X_dt_EXP03.RData") # loads traits_exp03
 traits_exp03 <- X_dt
 
 
@@ -110,7 +110,7 @@ make_heatmap <- function(df, exp_label) {
     height               = 5.5
   )
 
-  message("Saved: ", file.path(OUT_DIR, paste0("05_heatmap_", tolower(exp_label), ".pdf")))
+  message("Saved: ", file.path(OUT_DIR, paste0("04_heatmap_", tolower(exp_label), ".pdf")))
 }
 
 # ── 4. Run for both experiments ───────────────────────────────────────────────

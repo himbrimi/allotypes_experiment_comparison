@@ -41,32 +41,29 @@ HC types map to analysed glycopeptides as follows: Y → IgGI1, YA → IgGIA1, Y
 │   ├── figures/
 │   │   ├── 00-QC-EXP02.pdf                     # QC plot EXP02 (post-contamination filter)
 │   │   ├── 00-QC-EXP03.pdf                     # QC plot EXP03 (post-contamination filter)
-│   │   ├── 02-derived-traits_EXP02.pdf         # Derived trait distributions EXP02
-│   │   ├── 02-derived-traits_EXP03.pdf         # Derived trait distributions EXP03
-│   │   ├── 03-dt-EXP02.pdf                     # Trait summary EXP02
-│   │   ├── 03-dt-EXP03.pdf                     # Trait summary EXP03
-│   │   ├── 03-EXP02-HC-effect                  # HC effect plots EXP02
-│   │   ├── 03-EXP02-LC-effect                  # LC effect plots EXP02
-│   │   ├── 03-EXP02-LC_HC                      # LC×HC combined effect EXP02
-│   │   ├── 03-EXP02-raw-data                   # Raw data overview EXP02
-│   │   ├── 03-EXP03-HC-effect                  # HC effect plots EXP03
-│   │   ├── 03-EXP03-LC-effect                  # LC effect plots EXP03
-│   │   ├── 03-EXP03-raw-data                   # Raw data overview EXP03
-│   │   ├── 04-combined-HC-effect.pdf           # HC marginal emmeans, both experiments
-│   │   ├── 04-combined-LC-effect.pdf           # LC marginal emmeans, both experiments
-│   │   ├── 04-EXP02_vs_EXP03_traits.pdf        # Inter-experiment trait comparison
-│   │   ├── 04-EXP02_vs_EXP03_traits_per_HC.pdf # Inter-experiment trait comparison per HC
-│   │   ├── 05_heatmap_exp02.pdf                # Trait heatmap EXP02
-│   │   ├── 05_heatmap_exp02.png                # Trait heatmap EXP02 (PNG)
-│   │   ├── 05_heatmap_exp03.pdf                # Trait heatmap EXP03
-│   │   └── 05_heatmap_exp03.png                # Trait heatmap EXP03 (PNG)
+│   │   ├── 01-EXP02-dt.pdf                     # Derived trait distributions EXP02
+│   │   ├── 01-EXP03-dt.pdf                     # Derived trait distributions EXP03
+│   │   ├── 02-EXP02-dt_bw.pdf                  # Trait QC plot EXP02, b/w styling
+│   │   ├── 02-EXP02-HC_trajectories.pdf        # HC marginal emmeans EXP02
+│   │   ├── 02-EXP02-LC_effect.pdf              # LC marginal emmeans EXP02
+│   │   ├── 02-EXP02-LC_effect_per_HC.pdf       # HC×LC cell means with replicates EXP02
+│   │   ├── 02-EXP02-LC_slope_graph.pdf         # HC×LC emmeans slope graph EXP02
+│   │   ├── 02-EXP03-dt_bw.pdf                  # Trait QC plot EXP03, b/w styling
+│   │   ├── 02-EXP03-HC_trajectories.pdf        # HC marginal emmeans EXP03
+│   │   ├── 02-EXP03-LC_effect.pdf              # LC marginal emmeans EXP03
+│   │   ├── 02-EXP03-LC_effect_per_HC.pdf       # HC×LC cell means with replicates EXP03
+│   │   ├── 02-EXP03-LC_slope_graph.pdf         # HC×LC emmeans slope graph EXP03
+│   │   ├── 03-combined-HC-effect.pdf           # HC marginal emmeans, both experiments overlaid
+│   │   ├── 03-combined-LC-effect.pdf           # LC marginal emmeans, both experiments overlaid
+│   │   ├── 03-EXP02_vs_EXP03_traits.pdf        # EXP02 vs EXP03 mean areas, all traits/antibodies
+│   │   ├── 03-EXP02_vs_EXP03_traits_per_HC.pdf # EXP02 vs EXP03 mean areas, faceted by HC
+│   │   ├── 05_heatmap_exp02.pdf                # Trait z-score heatmap EXP02
+│   │   └── 05_heatmap_exp03.pdf                # Trait z-score heatmap EXP03
 │   └── tables/
-│       ├── 03-art-anova-EXP02.csv              # ART-ANOVA results EXP02 (with BH-FDR)
-│       ├── 03-art-anova-EXP03.csv              # ART-ANOVA results EXP03 (with BH-FDR)
-│       ├── 03-EXP02_data_averages.csv          # HC×LC trait means EXP02
-│       ├── 03-EXP03_data_averages.csv          # HC×LC trait means EXP03
-│       ├── 20260528-comparing_EXP02_EXP03.csv  # Inter-experiment comparison (flat)
-│       └── 20260528-comparing_EXP02_EXP03.xlsx # Inter-experiment comparison (with difference formulas)
+│       ├── 02-EXP02-art-anova.csv              # ART-ANOVA results EXP02 (with BH-FDR)
+│       ├── 02-EXP02_data_averages.csv          # HC×LC trait means EXP02
+│       ├── 02-EXP03-art-anova.csv              # ART-ANOVA results EXP03 (with BH-FDR)
+│       └── 02-EXP03_data_averages.csv          # HC×LC trait means EXP03
 ├── R/
 │   ├── 00-normalise_EXP02.R                    # Normalisation, QC, unification EXP02
 │   ├── 00-normalise_EXP03.R                    # Normalisation, QC, unification EXP03
@@ -190,7 +187,7 @@ Reproducibility managed with `renv`. Run `renv::restore()` to install the correc
 - [x] Charge-state integration audit tables produced (`docs/EXP03_charge_state_summary_v2.xlsx`, `docs/EXP02_charge_state_summary.xlsx`)
 - [x] Inter-experiment glycoform discrepancies documented (Step 1 prerequisite)
 - [x] Step 0 scripts written and executed — `R/00-normalise_EXP02.R`, `R/00-normalise_EXP03.R`; new RData files generated; supersede `01-QC_unification_*.R`
-- [ ] Step 1: Trait derivation — to be rerun (`R/01-derived_traits.R`, `R/01-derived_traits_exp02.R`)
-- [ ] Step 2: ART-ANOVA, BH-FDR, inter-experiment comparison — to be rerun (`R/02-derived_traits_stats.R`)
-- [ ] Step 3: Visualisation — to be rerun (`R/03-combined_effects_plot.R`, `R/04_trait_heatmap.R`)
+- [x] Step 1: Trait derivation — rerun for both experiments (`R/01-derived_traits.R`, `R/01-derived_traits_exp02.R`); outputs: `data/processed/01-X-EXP02.RData`, `data/processed/01-X-EXP03.RData`
+- [x] Step 2: ART-ANOVA, BH-FDR, emmeans — rerun (`R/02-derived_traits_stats.R`); results: `output/tables/02-EXP02-art-anova.csv`, `output/tables/02-EXP02_data_averages.csv`, `output/tables/02-EXP03-art-anova.csv`, `output/tables/02-EXP03_data_averages.csv`
+- [x] Step 3: Visualisation — `R/03-combined_effects_plot.R` and `R/04_trait_heatmap.R` run; combined emmeans plots, inter-experiment scatter, and trait heatmaps produced
 - [ ] Synthesis

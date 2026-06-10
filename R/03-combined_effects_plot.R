@@ -30,14 +30,16 @@ library(emmeans)
 # Shared helpers
 # ------------------------------------------------------------------------------
 
-glycan_levels  <- c("G0", "G", "S", "B", "M", "AntennaryF", "A1", "H")
+glycan_levels  <- c("Agalactosylation", "Galactosylation", "Sialylation",
+                    "Bisection", "High Mannose", "Antennary fucosylation",
+                    "Monoantennary", "Hybrid")
 glycan_labels  <- c("Agalactosylation", "Galactosylation", "Sialylation",
                     "Bisection", "High Mannose", "Antennary fucosylation",
                     "Monoantennary", "Hybrid")
 
 prepare_data <- function(path) {
   load(path)                              # loads object X into environment
-  X %>%
+  X_dt %>%
     filter(glycan %in% glycan_levels,
            type   != "stand") %>%
     mutate(
@@ -46,7 +48,7 @@ prepare_data <- function(path) {
       LC = as.factor(LC),
       HC = as.factor(HC)
     ) %>%
-    filter(tmpid %in% c("IgGI_Y", "IgGIA_YA", "IgGIF_YF", "IgGIILE_YI")) %>%
+    filter(tmpid %in% c("IgGI1_Y", "IgGIA1_YA", "IgGIF1_YF", "IgGIILE1_YI")) %>%
     mutate(across(where(is.numeric), ~ replace_na(., 0)))
 }
 
@@ -79,8 +81,8 @@ run_emmeans <- function(X_dt, getter) {
 # Load and prepare both experiments
 # ------------------------------------------------------------------------------
 
-X02 <- prepare_data("./data/processed/02-X-EXP02.Rdata")
-X03 <- prepare_data("./data/processed/02-X-EXP03.Rdata")
+X02 <- prepare_data("./data/processed/02-X_dt_EXP02.Rdata")
+X03 <- prepare_data("./data/processed/02-X_dt_EXP03.Rdata")
 
 
 
@@ -123,7 +125,7 @@ base_theme <- theme_bw() +
 # Plot 1 — LC marginal means, both experiments
 # ------------------------------------------------------------------------------
 
-pdf("./output/figures/04-combined-LC-effect.pdf", width = 12, height = 14)
+pdf("./output/figures/03-combined-LC-effect.pdf", width = 12, height = 14)
 
 ggplot(em_LC, aes(x = LC, y = emmean, group = experiment,
                   linetype = experiment, color = experiment)) +
@@ -176,7 +178,7 @@ dev.off()
 # Plot 3 — HC marginal means, both experiments
 # ------------------------------------------------------------------------------
 
-pdf("./output/figures/04-combined-HC-effect.pdf", width = 12, height = 14)
+pdf("./output/figures/03-combined-HC-effect.pdf", width = 12, height = 14)
 
 ggplot(em_HC, aes(x = HC, y = emmean, group = experiment,
                   linetype = experiment, color = experiment)) +
@@ -233,7 +235,7 @@ glycan_colours <- c(
 
 hc_shapes <- c(Y = 21, YA = 22, YF = 23, YI = 24)
 
-pdf("./output/figures/04-EXP02_vs_EXP03_traits.pdf", width = 12, height = 14)
+pdf("./output/figures/03-EXP02_vs_EXP03_traits.pdf", width = 12, height = 14)
 p <- ggplot(X_mw, aes(x = EXP02, y = EXP03))
 
 print(
@@ -291,7 +293,7 @@ dev.off()
 
 #### separately per IgG heavy chain
 
-pdf("./output/figures/04-EXP02_vs_EXP03_traits_per_HC.pdf", width = 12, height = 12)
+pdf("./output/figures/03-EXP02_vs_EXP03_traits_per_HC.pdf", width = 12, height = 12)
 
 
 p <- ggplot(X_mw, aes(x = EXP02, y = EXP03))

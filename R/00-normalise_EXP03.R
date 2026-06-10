@@ -54,7 +54,7 @@ setwd("~/Library/Mobile Documents/com~apple~CloudDocs/Documents/Documents - Olga
 # ------------------------------------------------------------------------------
 
 path_csv   <- "./data/raw/2026-03-18-1359Z_Summary_corrected_20260603.csv"
-path_rdata <- "./data/processed/00-X-exp03_v1_1_without_stands.RData"
+path_rdata <- "./data/processed/00-X-exp03_without_stands.RData"
 path_pdf   <- "./output/figures/00-QC-EXP03.pdf"
 
 

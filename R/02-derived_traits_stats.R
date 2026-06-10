@@ -22,7 +22,7 @@ library(emmeans)
 # Load data
 # ------------------------------------------------------------------------------
 
-load("./data/processed/02-X-EXP02.Rdata")
+load("./data/processed/01-X-EXP03.Rdata")
 
 
 
@@ -44,13 +44,6 @@ X_dt$glycan <- factor(X_dt$glycan, levels =c( "G0", "G", "S","B","M", "Antennary
 X_dt <- X_dt %>%
   filter(type != "stand")
 
-X_dt <- X_dt %>%
-  mutate(tmpid = paste(peptide, HC, sep = "_"))
-
-X_dt <- X_dt %>%
-  filter(tmpid %in% c("IgGI_Y", "IgGIA_YA", "IgGIF_YF","IgGIILE_YI" ))
-
-#X_dt[X_dt$narea == 0,]$narea <- NA
 
 X_dt$LC <- as.factor(X_dt$LC)
 X_dt$HC <- as.factor(X_dt$HC)
@@ -130,7 +123,7 @@ anova_results$p_adj <- p.adjust(anova_results$Pr, method = 'fdr' )
 anova_results <- anova_results %>%
   mutate(sign = ifelse(p_adj < 0.05, "sign", "no"))
 
-write.csv(anova_results, file= "./output/tables/03-art-anova-EXP02.csv")
+write.csv(anova_results, file= "./output/tables/02-EXP03-art-anova.csv")
 
 
 
@@ -282,7 +275,7 @@ print(
 # Save outputs
 # ------------------------------------------------------------------------------
 
-save(X_dt, file="./data/processed/03-X_dt_EXP02.RData")
+save(X_dt, file="./data/processed/02-X_dt_EXP03.RData")
 
 ### calculate averages
 
@@ -294,4 +287,4 @@ X_aver <- X_dt %>%
 Xa_w <- X_aver %>%
   spread(type, mean_narea)
 
-fwrite(Xa_w, file="./output/tables/03-EXP02_data_averages.csv")
+fwrite(Xa_w, file="./output/tables/02-EXP03_data_averages.csv")
