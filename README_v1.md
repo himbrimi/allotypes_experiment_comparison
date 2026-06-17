@@ -2,10 +2,6 @@
 **Project:** 2024_IgG_glycans_with_Anika  
 **Analysis folder:** 20260513_EXP02_vs_EXP03
 
-## ⚠️ Next session — do this first
-
-- [ ] **Audit `project_instructions.md` for discrepancies with the actual pipeline and data** — inconsistencies identified on 2026-06-11; resolve before continuing any analysis work.
-
 ## Overview
 
 This project investigates how antibody heavy chain (HC) and light chain (LC) amino acid sequence influences IgG glycosylation profiles. Eight antibodies (4 HC × 2 LC, full factorial design) were expressed in the same cell culture system and analysed by LC-MS of tryptic glycopeptides. Data are expressed as % normalised areas per glycoform per sample.
@@ -135,25 +131,16 @@ Both source CSVs were audited by systematic charge-state consistency checking ac
 
 ## Derived Trait Definitions
 
-| Label | Name | Glycoforms (both experiments) | EXP02 difference |
+| Label | Name | EXP03 | EXP02 additions |
 |---|---|---|---|
 | A1 | Monoantennary | H3N3F1 | — |
 | G0 | Agalactosylation | H3N3F1 + H3N4F1 + H3N5F1 | — |
 | G | Galactosylation | H4N4F1 + H4N5F1 + H5N4F1 + H5N4F2 + H5N5F1 + H6N3F1 | — |
-| S | Sialylation | H4N4F1S1 + H5N4F1S2 + H6N3F1S1 + H5N4F1S1 | ⚠ See note below |
-| M | High mannose | H4N2 + H5N2 + H6N2 | − H4N2 (integration error) |
-| B | Bisection | H3N5F1 + H4N5F1 + H5N5F1 | — |
-| AntennaryF | Antennary fucosylation | H5N4F2 | — |
-| H | Hybrid | H5N3F1 + H6N3F1 + H6N3F1S1 | ⚠ See note below |
-
-**Inter-experiment charge-state differences (verified 2026-06-17 against audit tables):**
-
-Two glycoforms contributing to S and H are integrated with different charge states across experiments. Glycoform formulas are identical but the integrated signal differs:
-
-- **H5N4F1S1** — EXP02: 2+ and 3+ (Y, YF, YI); EXP03: 2+ only (Y, YF, YI). EXP02 S values are slightly higher for these three HC types due to the additional 3+ contribution.
-- **H6N3F1S1** — EXP02: 2+ only (all HC types); EXP03: 2+ and 3+ (all HC types). EXP03 S and H values are slightly higher for all HC types due to the additional 3+ contribution.
-
-These two biases partially offset each other in the S trait but do not cancel cleanly (they affect different HC types). Inter-experiment comparisons of S and H should be interpreted with this caveat. All other traits are unaffected by charge-state differences.
+| S | Sialylation | H4N4F1S1 + H5N4F1S2 + H6N3F1S1 + H5N4F1S1|
+| M | High mannose | H4N2 + H5N2 + H6N2 | − H4N2 (integration error) | — |
+| B | Bisection | H3N5F1 + H4N5F1 + H5N5F1 | - |
+| AntennaryF | Antennary fucosylation | H5N4F2 | — (H5N4F2S1 removed from both experiments) |
+| H | Hybrid | H5N3F1 + H6N3F1 + H6N3F1S1 | — |
 
 
 
@@ -190,7 +177,6 @@ Reproducibility managed with `renv`. Run `renv::restore()` to install the correc
 - [x] EXP02 source corrections applied and verified (2026-06-03)
 - [x] H5N4F2S1 removed from both experiments (present in one HC type only per experiment)
 - [x] Charge-state integration audit tables produced (`docs/EXP03_charge_state_summary_v2.xlsx`, `docs/EXP02_charge_state_summary.xlsx`)
-- [x] Inter-experiment charge-state differences identified (2026-06-17): S and H traits affected; all other traits unaffected
 - [x] Inter-experiment glycoform discrepancies documented (Step 1 prerequisite)
 - [x] Step 0 scripts written and executed — `R/00-normalise_EXP02.R`, `R/00-normalise_EXP03.R`; new RData files generated; supersede `01-QC_unification_*.R`
 - [x] Step 1: Trait derivation — rerun for both experiments (`R/01-derived_traits.R`, `R/01-derived_traits_exp02.R`); outputs: `data/processed/01-X-EXP02.RData`, `data/processed/01-X-EXP03.RData`

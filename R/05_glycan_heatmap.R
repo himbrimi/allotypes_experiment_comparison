@@ -18,22 +18,21 @@ library(pheatmap)
 ## NOTE: these should be the *directly measured glycan* objects, NOT the derived
 ## traits used in 04_trait_heatmap.R. Rename the files / objects below to match
 ## your actual Step 2 glycan output (e.g. X_glycans, X_gl, X_norm, ...).
-load("./data/processed/02-X_glycans_EXP02.Rdata") # adjust if your object differs
-glycans_exp02 <- X_glycans
+load("./data/processed/01-X-EXP02.RData") # adjust if your object differs
+glycans_exp02 <- X
 
-load("./data/processed/02-X_glycans_EXP03.RData") # adjust if your object differs
-glycans_exp03 <- X_glycans
+load("./data/processed/01-X-EXP03.RData") # adjust if your object differs
+glycans_exp03 <- X
 
 
 # ── 0. Config ────────────────────────────────────────────────────────────────
 
-# Derived traits to EXCLUDE: these are computed summaries, not measured glycans.
-# Any row whose `glycan` matches one of these is dropped, so the heatmap shows
-# only directly measured glycan species. (Safe even if your object is glycans-only.)
-DERIVED_TRAITS <- c("Agalactosylation", "Galactosylation", "Sialylation",
-                    "High Mannose", "Bisection", "Antennary fucosylation",
-                    "Monoantennary", "Hybrid")
-
+# # Derived traits to EXCLUDE: these are computed summaries, not measured glycans.
+# # Any row whose `glycan` matches one of these is dropped, so the heatmap shows
+# # only directly measured glycan species. (Safe even if your object is glycans-only.)
+DERIVED_TRAITS <- c("G0", "G", "S",
+                    "A1", "B", "AntennaryF",
+                    "M", "H")
 # Clustering settings (applied to the row z-scored matrix)
 CLUST_DIST   <- "euclidean"   # "euclidean" or "correlation"
 CLUST_METHOD <- "ward.D2"     # e.g. "ward.D2", "complete", "average"

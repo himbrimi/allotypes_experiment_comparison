@@ -2,218 +2,139 @@
 
 ## Overview
 
-This project analyses the impact of antibody heavy chain (HC) and light chain (LC) amino acid sequence on IgG glycosylation profiles. Eight antibodies were expressed in the same cell culture system and analysed by LC-MS of tryptic glycopeptides. Data are expressed as % normalized areas per glycoform per sample.
+Impact of antibody heavy chain (HC) and light chain (LC) amino acid sequence on IgG glycosylation profiles. Eight antibodies (4 HC × 2 LC, full factorial) expressed in the same cell culture system; analysed by LC-MS of tryptic glycopeptides. Data: % normalised areas per glycoform per sample.
 
-Two independent experiments were performed approximately one year apart (EXP02 and EXP03). The LC-MS instrument underwent service procedures between experiments and cells may have been in a different metabolic state. Differences in detected glycoforms between experiments are documented below and preclude pooling; each experiment is analysed independently.
+Two independent experiments (EXP02, EXP03) performed ~1 year apart. Instrument servicing and cell metabolic state differ between experiments. Glycoform discrepancies and charge-state integration differences preclude pooling; each experiment is analysed independently.
 
 ---
 
 ## Experimental Design
 
-- **Layout:** 4 Heavy Chains × 2 Light Chains = 8 antibodies (full factorial design)
-- **Replicates:** 3 measurements per antibody per experiment
-- **Peptides analysed:** IgGI1 (HC=Y), IgGIA1 (HC=YA), IgGIF1 (HC=YF), IgGIILE1 (HC=YI)
-- **Primary scientific questions:**
-  - Do HC sequence, LC sequence, or their interaction drive specific glycan traits?
-  - Which glycan trait effects replicate consistently across both experiments?
+- **Layout:** Y × {WT, NO}, YA × {WT, NO}, YF × {WT, NO}, YI × {WT, NO} = 8 antibodies
+- **Replicates:** 3 per antibody per experiment
+- **Peptides:** IgGI1 (HC=Y), IgGIA1 (HC=YA), IgGIF1 (HC=YF), IgGIILE1 (HC=YI)
+- **Questions:** Do HC, LC, or HC×LC interactions drive glycan traits? Which effects replicate?
 
 ---
 
 ## Raw Data Files
 
-The corrected LaCyTools summary CSVs are the authoritative source inputs for this analysis. Both were manually corrected on 2026-06-03 and verified by systematic charge-state audit. Charge-state integration summaries are documented in `docs/`.
-
 | File | Experiment | Location |
 |---|---|---|
 | `2026-03-18-1359Z_Summary_corrected_20260603.csv` | EXP03 | `data/raw/` |
 | `exp02-all-data-raw_EXCEL_MAC-e3dited_corrected_20260603.csv` | EXP02 | `data/raw/` |
+| `EXP02_samples.csv` | EXP02 metadata | `data/raw/` |
 
-These replace the previously used `00-X-exp03_without_stands.RData` and `00-X-exp02_without_stands.RData` as starting points. Renormalised RData files will be regenerated from these CSVs by `R/00-normalise_EXP03.R` and `R/00-normalise_EXP02.R` (Step 0).
-
-### EXP03 source corrections (2026-06-03)
-
-The original LaCyTools output contained charge-state integration errors. All corrections involve removal of erroneously included ions; no new integrations were added.
-
-| Glycoform | Correction | Scope | Rationale |
-|---|---|---|---|
-| H3N5F1 | Removed 3+ ions | IgGIA1 (YA) only | Inconsistent with all other HC types where 3+ was not integrated |
-| H5N2 | Removed 3+ ions | All HC types | 3+ ions not used for this structure in any sample type |
-| H6N3F1 | Removed 3+ ions | IgGIILE1 (YI) only | Inconsistent with all other HC types where 3+ was excluded |
-| H4N4F2 | Removed 2+ ions | IgGIA1 (YA) and IgGIILE1 (YI) | S/N below threshold of 9; retained for IgGI1 (Y) and IgGIF1 (YF) |
-| H5N4F1S1 | Removed all ions | All HC types | Signal determined to be noise upon re-inspection; structure absent from EXP03 entirely |
-| H5N4F2S1 | Removed all ions | IgGI1 (Y) only | Present in Y only; removed for cross-experiment comparability (absent from EXP02 in all HC types) |
-
-**Verification:** all corrections confirmed by systematic charge-state audit (Python; 2026-06-03). Charge-state integration summary: `docs/EXP03_charge_state_summary_v2.xlsx`.
-
-### EXP02 source corrections (2026-06-03)
-
-The original LaCyTools output also contained charge-state integration errors. All corrections involve removal of erroneously included ions.
-
-| Glycoform | Correction | Scope | Rationale |
-|---|---|---|---|
-| H5N4F1S1 | Removed all ions | IgGIA1 (YA) only | S/N below threshold; retained for Y, YF, YI |
-| H4N4F2 | Removed all ions | IgGIILE1 (YI) only | S/N below threshold of 9; retained for Y and YF (YA has no column) |
-| H5N4F2 | 2+ only retained | IgGI1 (Y) and IgGIF1 (YF) | 3+ excluded; absent for YA and YI |
-| H6N3F1S1 | Removed 3+ ions | All HC types | 3+ excluded globally |
-| H5N4F2S1 | Absent | IgGIILE1 (YI) only, zeroed | Present in YI only; removed for cross-experiment comparability |
-
-**Verification:** all corrections confirmed by systematic charge-state audit (Python; 2026-06-03). Charge-state integration summary: `docs/EXP02_charge_state_summary.xlsx`.
-
-### H5N4F2S1 — removed from both experiments
-
-H5N4F2S1 was present in only one HC type per experiment (Y in EXP03; YI in EXP02, zeroed after correction). It contributes to the S and AntennaryF traits but cannot be compared across experiments. It has been removed from both corrected CSVs and will be excluded during normalisation (Step 0). This supersedes the earlier entry in the inter-experiment discrepancy table.
+Both CSVs corrected 2026-06-03 (charge-state integration errors removed; no new integrations added). Audit tables: `docs/EXP02_charge_state_summary.xlsx`, `docs/EXP03_charge_state_summary_v2.xlsx`.
 
 ---
 
-## Analysis Plan (8 steps)
+## Analysis Pipeline
 
-### Step 0 — Renormalisation from corrected source CSVs (new)
+### Step 0 — Normalisation (`00-normalise_EXP02.R`, `00-normalise_EXP03.R`)
 
-**Inputs:**
-- `data/raw/2026-03-18-1359Z_Summary_corrected_20260603.csv` (EXP03)
-- `data/raw/exp02-all-data-raw_EXCEL_MAC-e3dited_corrected_20260603.csv` (EXP02)
+Read corrected source CSV → sum charge states per glycopeptide per sample → remove blanks/standards → normalise to sum = 100 per peptide per sample → flag and remove contamination (peptide–HC mismatch) → complete peptide × glycan grid → remove H5N4F2S1 and H5N4F2S2 globally → zero allotype-specific below-threshold structures (see below) → derive HC/LC/type columns → QC plot.
 
-For each experiment: read corrected LaCyTools summary CSV, remove standards, exclude H5N4F2S1 columns, and renormalise absolute areas to sum = 100 per sample per peptide. Export renormalised standards-free datasets as:
-- `data/processed/00-X-exp03_without_stands.RData`
-- `data/processed/00-X-exp02_without_stands.RData`
+**EXP02** (`00-normalise_EXP02.R`): sample metadata from `EXP02_samples.csv` via `genos_id` key. Zeros H4N4F2, H5N4F2, H5N5F1 for YA.
+**EXP03** (`00-normalise_EXP03.R`): metadata parsed from sample names (pattern `HC-LC_rep_...`). Includes NA Charge filter. Zeros H4N4F2 for YA and YI.
 
-Scripts: `R/00-normalise_EXP03.R` and `R/00-normalise_EXP02.R`.
+Outputs: `data/processed/00-X-exp02_without_stands.RData`, `data/processed/00-X-exp03_without_stands.RData`.
+Supersedes: `01-QC_unification_EXP02.R`, `01-QC_unification_EXP03.R` (archived).
 
-### Step 1 — Inter-experiment glycoform audit (prerequisite, not a statistical step)
+### Step 1 — Derived traits (`01-derived_traits_exp02.R`, `01-derived_traits_exp03.R`)
 
-Compare the glycoforms present in the two curated datasets and document all differences in representation between EXP02 and EXP03. This serves three purposes: (1) justifies analysing experiments separately rather than pooling; (2) identifies which derived traits are affected and in which direction; (3) provides a factual report for cell culture teams on inter-experiment variation.
+Load Step 0 output → spread to wide format → apply `derived_traits()` function → gather back to long → filter to 8 trait labels → set zeros to NA for plotting → save.
 
-**Output:** a table listing, for each glycoform that differs: its status in each experiment, which traits are affected, and the expected directional bias on those traits. Classify traits as unaffected (directly comparable) or affected (inter-experiment comparison requires explicit bias notation).
+Exclusions applied implicitly via zeroing in Step 0: H4N4F2 excluded from G and AntennaryF for relevant HC types; H4N3F1 not included in any trait formula (co-eluting isomers).
 
-**Confirmed discrepancies (post-correction):**
+**EXP02 vs EXP03 trait differences:**
+- M: EXP02 uses `H5N2 + H6N2` (H4N2 absent — integration error); EXP03 uses `H4N2 + H5N2 + H6N2`
+- S and H: same formula both experiments, but charge-state differences affect integrated signal (see Charge-State Bias below)
 
-| Glycoform | EXP02 | EXP03 | Affected traits | Directional bias |
-|---|---|---|---|---|
-| H4N5F1S1 | Present | Absent (could not be reliably quantified) | B, S | B and S slightly higher in EXP02 |
-| H5N4F1S1 | Present (Y, YF, YI) | Absent (noise; source correction 2026-06-03) | S | S slightly higher in EXP02 |
-| H4N2 | Absent (integration error; removed globally) | Present | M | M slightly lower in EXP02 |
+Outputs: `data/processed/01-X-EXP02.RData`, `data/processed/01-X-EXP03.RData`.
 
-H5N4F2S1 removed from both experiments — no longer a discrepancy.
+### Step 2 — ART-ANOVA + BH-FDR + emmeans (`02-derived_traits_stats.R`)
 
-**Traits unaffected by discrepancies:** G0, G, A1, H (directly comparable across experiments).
-**Traits affected:** S, B, M (inter-experiment comparison requires explicit bias notation). AntennaryF now unaffected (H5N4F2S1 removed from both).
+Load Step 1 output → filter to 8 traits → `art(narea ~ HC * LC)` per trait (24 tests per experiment) → BH-FDR across all 24 p-values → extract LC marginal emmeans, HC marginal emmeans, HC×LC cell means → QC plot, LC effect plot, slope graph, HC trajectory plot → save results.
 
-### Step 2 — Derive traits per experiment separately
+**Caveat:** ART interaction tests can have inflated type I error when main effects are very large (Elkin et al. 2021). With 3 replicates per cell, power for the interaction term is limited.
 
-Calculate all 8 traits independently for EXP02 and EXP03 using experiment-specific glycoform availability. Do not apply a common restricted definition — each experiment uses the best available data for that dataset.
+Outputs: `output/tables/02-EXP02-art-anova.csv`, `output/tables/02-EXP02_data_averages.csv`, `output/tables/02-EXP03-art-anova.csv`, `output/tables/02-EXP03_data_averages.csv`.
 
-**Note for EXP03:** H5N4F1S1 absent from EXP03 (noise; source correction) — excluded from S trait. H4N4F2 excluded for YA and YI (allotype-specific; already excluded from G and AntennaryF globally).
+### Step 3 — Visualisation (`03-combined_effects_plot.R`, `04_trait_heatmap.R`, `05_glycan_heatmap.R`)
 
-**Note for EXP02:** H5N4F1S1 absent for YA (allotype-specific exclusion). H4N4F2 absent for YI. H5N4F2S1 excluded from both experiments.
+**`03-combined_effects_plot.R`:** Re-fits ART models on both experiments; overlays LC and HC marginal emmeans (EXP02 solid/dark, EXP03 dashed/light); produces EXP02 vs EXP03 scatter plots (identity line, colour = trait, shape = HC, fill = LC). HC×LC plots omitted — no interactions significant after BH-FDR in either experiment.
 
-### Step 3 — ART-ANOVA per experiment separately
+**`04_trait_heatmap.R`:** Row-z-scored heatmap of derived trait means per antibody (HC × LC). Traits affected by inter-experiment discrepancies asterisked. Bidirectional clustering; Y_NO anchored leftmost.
 
-Aligned Rank Transform ANOVA using the `ARTool` package, run independently for each experiment:
+**`05_glycan_heatmap.R`:** Same approach for directly measured glycans; both rows (glycans) and columns (antibodies) clustered. Load paths require adjustment to match Step 1 glycan output object name.
 
-```r
-art(trait ~ HC * LC, data = df)
-```
+Outputs: `output/figures/03-*`, `output/figures/05_heatmap_exp0*.pdf`.
 
-Tests HC main effect, LC main effect, and HC×LC interaction for each trait (3 tests × 8 traits = 24 tests per experiment).
+### Step 4 — Synthesis
 
-**Known caveat:** ART interaction tests can have inflated type I error when main effects are very large (Elkin et al. 2021). If a dominant main effect is found, cross-validate the interaction using standard parametric two-way ANOVA.
-
-**Power note:** With only 3 replicates per HC×LC cell, power is limited — especially for the interaction term. Effects must replicate across both experiments to be considered robust.
-
-### Step 4 — Inter-experiment comparison (descriptive)
-
-For traits unaffected by glycoform discrepancies (G0, G, A1, H, AntennaryF), compute Spearman ρ between EXP02 and EXP03 antibody means across the 8 antibodies as a reproducibility check. No pass/fail threshold; ρ reported as descriptive evidence of consistency.
-
-For traits affected by missing glycoforms (S, B, M), note the directional bias explicitly — do not compute ρ as a comparability measure.
-
-Spearman ρ results are intended for internal use and supplementary material; not a primary paper result.
-
-### Step 5 — FDR correction
-
-Apply Benjamini-Hochberg FDR separately within each experiment across all 24 tests (8 traits × 3 effects: HC, LC, HC×LC). Significance threshold: q < 0.05.
-
-### Step 6 — Visualisation
-
-Implemented in `04-combined_effects_plot.R`. Emmeans from ART models plotted for both experiments on the same graph, with experiment encoded as line type (EXP02 solid, EXP03 dashed) and colour lightness. Two plot types produced:
-
-- **HC marginal means** (pooled across LC) — `04-combined-HC-effect.pdf`
-- **LC marginal means** (pooled across HC) — `04-combined-LC-effect.pdf`
-
-HC×LC cell means code is present in the script but commented out — no HC×LC interactions were significant after BH-FDR correction in either experiment.
-
-### Step 7 — Synthesis
-
-Biological conclusions drawn only from effects that are:
-- Statistically significant (q < 0.05) in both experiments independently, **and**
-- Consistent in direction in both experiments.
-
-Effects significant in only one experiment are reported as exploratory.
+Biological conclusions drawn only from effects significant (q < 0.05) in both experiments independently and consistent in direction. Effects significant in one experiment only are reported as exploratory.
 
 ---
 
 ## Trait Definitions
 
-Eight derived traits, calculated independently per experiment using available glycoforms.
-
-| Label | Name | EXP03 | EXP02 additions |
+| Label | Name | Glycoforms (both experiments) | EXP02 difference |
 |---|---|---|---|
 | A1 | Monoantennary | H3N3F1 | — |
 | G0 | Agalactosylation | H3N3F1 + H3N4F1 + H3N5F1 | — |
 | G | Galactosylation | H4N4F1 + H4N5F1 + H5N4F1 + H5N4F2 + H5N5F1 + H6N3F1 | — |
-| S | Sialylation | H4N4F1S1 + H5N4F1S2 + H6N3F1S1 | + H4N5F1S1 + H5N4F1S1 (Y, YF, YI only) |
+| S | Sialylation | H4N4F1S1 + H5N4F1S1 + H5N4F1S2 + H6N3F1S1 | ⚠ See charge-state bias note |
 | M | High Mannose | H4N2 + H5N2 + H6N2 | − H4N2 (integration error) |
-| B | Bisection | H3N5F1 + H4N5F1 + H5N5F1 | + H4N5F1S1 |
-| AntennaryF | Antennary fucosylation | H5N4F2 | — (H5N4F2S1 removed from both experiments) |
-| H | Hybrid | H5N3F1 + H6N3F1 + H6N3F1S1 | — |
+| B | Bisection | H3N5F1 + H4N5F1 + H5N5F1 | — |
+| AntennaryF | Antennary fucosylation | H5N4F2 | — |
+| H | Hybrid | H5N3F1 + H6N3F1 + H6N3F1S1 | ⚠ See charge-state bias note |
 
-Fucosylation trait dropped: all non-high-mannose structures in this dataset carry core fucose, making Fuc perfectly collinear with 100 − M.
+Fucosylation dropped: all non-HM structures carry core fucose → perfectly collinear with 100 − M.
 
-H5N4F1S1: absent from EXP03 (noise; source correction 2026-06-03). Present in EXP02 for Y, YF, YI; absent for YA (below QC threshold).
-H5N4F2S1: removed from both experiments — present in only one HC type per experiment, precluding meaningful comparison.
+**Charge-state bias (verified 2026-06-17):**
+- **H5N4F1S1** — EXP02: 2+ and 3+ (Y, YF, YI); EXP03: 2+ only. EXP02 S slightly higher for Y, YF, YI.
+- **H6N3F1S1** — EXP02: 2+ only; EXP03: 2+ and 3+ (all HC). EXP03 S and H slightly higher for all HC types.
+- The two S biases partially offset but do not cancel (different HC types affected). Inter-experiment comparison of S and H requires this caveat. All other traits unaffected.
 
 ---
 
-## Glycan Structure Exclusions
+## Glycan Exclusions
 
-### Common to both experiments
+**Global (both experiments):**
 
 | Glycan | Excluded from | Reason |
 |---|---|---|
-| H4N3F1 | G0, G, B | Co-eluting isomer mixture |
+| H4N3F1 | All traits | Co-eluting isomer mixture |
 | H4N4F2 | G, AntennaryF | Antennary fucose position unconfirmed |
-| H5N4F2S1 | All traits | Present in only one HC type per experiment; removed from both CSVs before normalisation (2026-06-03) |
+| H5N4F2S1 | All traits | Present in one HC type only per experiment; removed from both CSVs before normalisation |
 
-### Experiment-specific exclusions
-
-| Glycoform | EXP02 | EXP03 | Reason |
-|---|---|---|---|
-| H4N5F1S1 | Present | Absent | Could not be reliably quantified in EXP03 |
-| H5N4F1S1 | Present (Y, YF, YI); absent (YA) | Absent (all HC types) | EXP03: noise upon re-inspection (source correction 2026-06-03). EXP02: below QC threshold for YA |
-| H4N2 | Absent | Present | Integration error in EXP02 (detected in IgGIF1 only); removed globally |
-
-### Allotype-specific exclusions
+**Allotype-specific:**
 
 | Glycoform | Experiment | Excluded for | Retained for | Reason |
 |---|---|---|---|---|
-| H4N4F2 | EXP03 | YA, YI | Y, YF | S/N below threshold in YA and YI |
-| H4N4F2 | EXP02 | YI | Y, YF | S/N below threshold of 9; no column for YA |
-| H5N4F1S1 | EXP02 | YA | Y, YF, YI | S/N below threshold |
-| H5N4F2 | EXP02 | YA, YI | Y, YF | Not detected; 2+ only retained for Y and YF |
+| H4N4F2 | EXP03 | YA, YI | Y, YF | S/N below threshold |
+| H4N4F2 | EXP02 | YA, YI | Y, YF | S/N below threshold; no column for YA in source |
+| H5N4F2 | EXP02 | YA, YI | Y, YF | Not detected; 2+ only for Y and YF |
+| H5N5F1 | EXP02 | YA | Y, YF, YI | Not detected |
 
 ---
 
-## R Environment
+## Inter-Experiment Glycoform Discrepancies
 
-- Language: R
-- Key packages: `ARTool`, `ggplot2`, `pheatmap`, `tidyverse`, `rstatix`, `data.table`
-- Reproducibility: `renv`
-- Version control: GitHub
+| Glycoform | EXP02 | EXP03 | Affected traits | Bias |
+|---|---|---|---|---|
+| H4N2 | Absent (integration error) | Present | M | M slightly lower in EXP02 |
+
+H5N4F2S1 removed from both experiments — no longer a discrepancy. H5N4F1S1 and H6N3F1S1 present in both but with different charge states integrated (see Charge-State Bias above).
+
+**Traits unaffected (directly comparable):** G0, G, A1, B, AntennaryF.
+**Traits requiring caveat:** M (missing glycoform), S and H (charge-state bias).
 
 ---
 
 ## Key References
 
-- Bland & Altman (1986). Statistical methods for assessing agreement. *The Lancet.*
 - Wobbrock et al. (2011). The Aligned Rank Transform. *CHI 2011.*
 - Elkin et al. (2021). ART for Multifactor Contrast Tests. *UIST 2021.*
 - Benjamini & Hochberg (1995). Controlling the False Discovery Rate. *JRSS-B.*
@@ -222,15 +143,10 @@ H5N4F2S1: removed from both experiments — present in only one HC type per expe
 
 ## Current Status
 
-- [x] Analysis plan defined
-- [x] Trait definitions finalised per experiment (8 traits; Fuc dropped)
-- [x] EXP03 source corrections applied and verified (2026-06-03)
-- [x] EXP02 source corrections applied and verified (2026-06-03)
-- [x] H5N4F2S1 removed from both experiments (present in one HC type only per experiment)
-- [x] Charge-state integration summaries produced (`docs/EXP03_charge_state_summary_v2.xlsx`, `docs/EXP02_charge_state_summary.xlsx`)
-- [x] Glycoform discrepancies between experiments documented and updated (Step 1)
-- [x] **Step 0: Renormalisation scripts written and executed** — `R/00-normalise_EXP03.R` and `R/00-normalise_EXP02.R`; new RData files generated; supersede `01-QC_unification_*.R`
-- [x] **Step 2: Derive traits** — rerun for both experiments (`R/01-derived_traits.R`, `R/01-derived_traits_exp02.R`); outputs: `data/processed/01-X-EXP02.RData`, `data/processed/01-X-EXP03.RData`
-- [x] **Step 3: ART-ANOVA + BH-FDR + emmeans** — rerun for both experiments (`R/02-derived_traits_stats.R`); results: `output/tables/02-EXP02-art-anova.csv`, `output/tables/02-EXP02_data_averages.csv`, `output/tables/02-EXP03-art-anova.csv`, `output/tables/02-EXP03_data_averages.csv`
-- [x] **Steps 4 + 6: Inter-experiment comparison and visualisation** — `R/03-combined_effects_plot.R` and `R/04_trait_heatmap.R` run; combined emmeans plots and scatter comparisons produced; heatmaps produced
-- [ ] Step 7: Synthesis
+- [x] Source corrections applied and verified (2026-06-03); audit tables in `docs/`
+- [x] Inter-experiment glycoform discrepancies and charge-state differences documented (2026-06-17)
+- [x] Step 0: Normalisation scripts written and executed
+- [x] Step 1: Derived traits — both experiments; outputs: `01-X-EXP02.RData`, `01-X-EXP03.RData`
+- [x] Step 2: ART-ANOVA + BH-FDR + emmeans — both experiments; results in `output/tables/`
+- [x] Step 3: Visualisation — combined emmeans plots, scatter comparisons, trait heatmaps produced
+- [ ] Step 4: Synthesis

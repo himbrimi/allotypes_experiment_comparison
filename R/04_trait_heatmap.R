@@ -10,6 +10,7 @@
 
 library(tidyverse)
 library(pheatmap)
+library(dendextend)
 
 ## load data
 load("./data/processed/02-X_dt_EXP02.Rdata") # loads traits_exp02
@@ -27,6 +28,17 @@ TRAITS <- c("Agalactosylation", "Galactosylation", "Sialylation", "High Mannose"
 
 TRAIT_LABELS <- setNames(TRAITS, TRAITS)
 
+ANCHOR_COL <- "Y_NO"
+
+anchor_callback <- function(hc, ...) {
+  if (ANCHOR_COL %in% hc$labels) {                 # only the column tree has this label
+    wts <- ifelse(hc$labels == ANCHOR_COL, -Inf, seq_along(hc$labels))
+    d <- reorder(as.dendrogram(hc), wts, agglo.FUN = mean)
+    return(as.hclust(d))
+  }
+  hc  
+}
+
 # Traits with known inter-experiment glycoform discrepancies — flagged with *
 AFFECTED_TRAITS <- c("Sialylation", "Bisection", "Antennary fucosylation", "Monoantennary")
 
@@ -38,6 +50,12 @@ DATA <- list(
 
 OUT_DIR <- "output/figures"
 dir.create(OUT_DIR, recursive = TRUE, showWarnings = FALSE)
+
+
+# Clustering settings (applied to the row z-scored matrix)
+CLUST_DIST   <- "euclidean"   # "euclidean" or "correlation"
+CLUST_METHOD <- "ward.D2"     # e.g. "ward.D2", "complete", "average"
+
 
 # ── 1. Colour palette: cold (blue) → white → warm (red) ─────────────────────
 
@@ -72,8 +90,23 @@ make_heatmap <- function(df, exp_label) {
     column_to_rownames("glycan") |>
     as.matrix()
   
+ 
+  
+  # Column annotation (HC / LC) — helps interpret the column dendrogram
+  annotation_col <- means |>
+    distinct(antibody, HC, LC) |>
+    column_to_rownames("antibody")
+  annotation_col <- annotation_col[colnames(mat), , drop = FALSE]
+  
+  # Drop glycans that are all-NA or constant (can't be z-scored / clustered)
+  keep <- apply(mat, 1, function(r) sum(!is.na(r)) >= 2 && sd(r, na.rm = TRUE) > 0)
+  mat  <- mat[keep, , drop = FALSE]
+  
   # Z-score each row so colour encodes deviation from trait mean
   mat <- t(scale(t(mat)))
+  
+  # Replace any residual NA/NaN with 0 (= row mean in z-space) so clustering runs
+  mat[is.na(mat)] <- 0
   
   
   # Symmetric breaks centred on 0  <-- ADD HERE
@@ -90,10 +123,15 @@ make_heatmap <- function(df, exp_label) {
   pheatmap(
     mat,
     color                = heatmap_colours,
-    cluster_rows         = FALSE,
-    cluster_cols         = FALSE,
-    annotation_colors    = FALSE,
-    annotation_names_col = TRUE,
+    scale                    = "none",          # already z-scored above
+    cluster_rows             = TRUE,            # cluster glycans
+    cluster_cols             = TRUE,            # cluster sample types
+    clustering_distance_rows = CLUST_DIST,
+    clustering_distance_cols = CLUST_DIST,
+    clustering_method        = CLUST_METHOD,
+    clustering_callback = anchor_callback,
+    annotation_col           = annotation_col,
+    annotation_names_col     = TRUE,
     show_colnames        = TRUE,
     show_rownames        = TRUE,
     fontsize             = 10,
@@ -105,7 +143,7 @@ make_heatmap <- function(df, exp_label) {
     cellheight           = 22,
     legend               = TRUE,
     main                 = paste0(exp_label, "— trait z-scores per antibody (row-scaled)"),
-    filename             = file.path(OUT_DIR, paste0("05_heatmap_", tolower(exp_label), ".pdf")),
+    filename             = file.path(OUT_DIR, paste0("04_heatmap_", tolower(exp_label), ".pdf")),
     width                = 9,
     height               = 5.5
   )
