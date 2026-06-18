@@ -25,7 +25,7 @@ Two independent experiments (EXP02, EXP03) performed ~1 year apart. Instrument s
 | `exp02-all-data-raw_EXCEL_MAC-e3dited_corrected_20260603.csv` | EXP02 | `data/raw/` |
 | `EXP02_samples.csv` | EXP02 metadata | `data/raw/` |
 
-Both CSVs corrected 2026-06-03 (charge-state integration errors removed; no new integrations added). Audit tables: `docs/EXP02_charge_state_summary.xlsx`, `docs/EXP03_charge_state_summary_v2.xlsx`.
+Both CSVs corrected 2026-06-03 (charge-state integration errors removed; no new integrations added). Audit tables: `docs/EXP02_charge_state_summary.xlsx`, `docs/EXP03_charge_state_summary_20260603.xlsx`.
 
 ---
 
@@ -69,7 +69,7 @@ Outputs: `output/tables/02-EXP02-art-anova.csv`, `output/tables/02-EXP02_data_av
 
 **`05_glycan_heatmap.R`:** Same approach for directly measured glycans; both rows (glycans) and columns (antibodies) clustered. Load paths require adjustment to match Step 1 glycan output object name.
 
-Outputs: `output/figures/03-*`, `output/figures/05_heatmap_exp0*.pdf`.
+Outputs: `output/figures/03-*`, `output/figures/04_heatmap_exp0*.pdf`, `output/figures/05_glycan_heatmap_exp0*.pdf`.
 
 ### Step 4 — Synthesis
 
@@ -143,7 +143,7 @@ H5N4F2S1 removed from both experiments — no longer a discrepancy. H5N4F1S1 and
 
 ## Current Status
 
-- [x] Source corrections applied and verified (2026-06-03); audit tables in `docs/`
+- [x] Source corrections applied and verified (2026-06-03); audit tables in `docs/` (`EXP02_charge_state_summary.xlsx`, `EXP03_charge_state_summary_20260603.xlsx`)
 - [x] Inter-experiment glycoform discrepancies and charge-state differences documented (2026-06-17)
 - [x] Step 0: Normalisation scripts written and executed
 - [x] Step 1: Derived traits — both experiments; outputs: `01-X-EXP02.RData`, `01-X-EXP03.RData`
