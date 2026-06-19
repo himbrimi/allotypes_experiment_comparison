@@ -30,10 +30,10 @@ library(emmeans)
 # Shared helpers
 # ------------------------------------------------------------------------------
 
-glycan_levels  <- c("Agalactosylation", "Galactosylation", "Sialylation",
+glycan_levels  <- c("Agalactosylation", "Galactosylation", "Sialylation", "Sialylation (A2)",
                     "Bisection", "High Mannose", "Antennary fucosylation",
                     "Monoantennary", "Hybrid")
-glycan_labels  <- c("Agalactosylation", "Galactosylation", "Sialylation",
+glycan_labels  <- c("Agalactosylation", "Galactosylation", "Sialylation","Sialylation (A2)",
                     "Bisection", "High Mannose", "Antennary fucosylation",
                     "Monoantennary", "Hybrid")
 
@@ -81,8 +81,8 @@ run_emmeans <- function(X_dt, getter) {
 # Load and prepare both experiments
 # ------------------------------------------------------------------------------
 
-X02 <- prepare_data("./data/processed/02-X_dt_EXP02.Rdata")
-X03 <- prepare_data("./data/processed/02-X_dt_EXP03.Rdata")
+X02 <- prepare_data("./data/processed/02-X_dt_EXP02_S_A2.RData")
+X03 <- prepare_data("./data/processed/02-X_dt_EXP03_S_A2.RData")
 
 
 
@@ -90,14 +90,14 @@ X03 <- prepare_data("./data/processed/02-X_dt_EXP03.Rdata")
 # Compute emmeans per experiment
 # ------------------------------------------------------------------------------
 
-em_LC_02   <- run_emmeans(X02, get_em_LC)    %>% mutate(experiment = "EXP02")
-em_LC_03   <- run_emmeans(X03, get_em_LC)    %>% mutate(experiment = "EXP03")
+em_LC_02   <- run_emmeans(X02, get_em_LC)    %>% mutate(experiment = "EXP 1")
+em_LC_03   <- run_emmeans(X03, get_em_LC)    %>% mutate(experiment = "EXP 2")
 
-em_HC_LC_02 <- run_emmeans(X02, get_em_HC_LC) %>% mutate(experiment = "EXP02")
-em_HC_LC_03 <- run_emmeans(X03, get_em_HC_LC) %>% mutate(experiment = "EXP03")
+em_HC_LC_02 <- run_emmeans(X02, get_em_HC_LC) %>% mutate(experiment = "EXP 1")
+em_HC_LC_03 <- run_emmeans(X03, get_em_HC_LC) %>% mutate(experiment = "EXP 2")
 
-em_HC_02   <- run_emmeans(X02, get_em_HC)    %>% mutate(experiment = "EXP02")
-em_HC_03   <- run_emmeans(X03, get_em_HC)    %>% mutate(experiment = "EXP03")
+em_HC_02   <- run_emmeans(X02, get_em_HC)    %>% mutate(experiment = "EXP 1")
+em_HC_03   <- run_emmeans(X03, get_em_HC)    %>% mutate(experiment = "EXP 2")
 
 em_LC    <- bind_rows(em_LC_02,    em_LC_03)
 em_HC_LC <- bind_rows(em_HC_LC_02, em_HC_LC_03)
@@ -109,8 +109,8 @@ em_HC    <- bind_rows(em_HC_02,    em_HC_03)
 # Shared theme and scales
 # ------------------------------------------------------------------------------
 
-exp_linetypes <- c("EXP02" = "solid", "EXP03" = "dashed")
-exp_alphas    <- c("EXP02" = 0.20,    "EXP03" = 0.10)   # ribbon transparency
+exp_linetypes <- c("EXP 1" = "solid", "EXP 2" = "dashed")
+exp_alphas    <- c("EXP 1" = 0.20,    "EXP 2" = 0.10)   # ribbon transparency
 
 base_theme <- theme_bw() +
   theme(
@@ -137,8 +137,8 @@ ggplot(em_LC, aes(x = LC, y = emmean, group = experiment,
   geom_line(linewidth = 1.2) +
   scale_linetype_manual(values = exp_linetypes) +
   scale_alpha_manual(values = exp_alphas, guide = "none") +
-  scale_color_manual(values = c("EXP02" = "grey20", "EXP03" = "grey60")) +
-  scale_fill_manual( values = c("EXP02" = "grey20", "EXP03" = "grey60")) +
+  scale_color_manual(values = c("EXP 1" = "grey20", "EXP 2" = "grey60")) +
+  scale_fill_manual( values = c("EXP 1" = "grey20", "EXP 2" = "grey60")) +
   ylab("Aligned rank transformed normalized area") +
   base_theme
 
@@ -190,8 +190,8 @@ ggplot(em_HC, aes(x = HC, y = emmean, group = experiment,
   geom_line(linewidth = 1.2) +
   scale_linetype_manual(values = exp_linetypes) +
   scale_alpha_manual(values = exp_alphas, guide = "none") +
-  scale_color_manual(values = c("EXP02" = "grey20", "EXP03" = "grey60")) +
-  scale_fill_manual( values = c("EXP02" = "grey20", "EXP03" = "grey60")) +
+  scale_color_manual(values = c("EXP 1" = "grey20", "EXP 2" = "grey60")) +
+  scale_fill_manual( values = c("EXP 1" = "grey20", "EXP 2" = "grey60")) +
   ylab("Aligned rank transformed normalized area") +
   base_theme
 
@@ -204,11 +204,11 @@ dev.off()
 
 X02_m <- X02 %>%
   summarise(across(where(is.numeric), mean), .by = c(glycan, LC, HC)) %>%
-  mutate(experiment = "EXP02")
+  mutate(experiment = "EXP1")
 
 X03_m <- X03 %>%
   summarise(across(where(is.numeric), mean), .by = c(glycan, LC, HC)) %>%
-  mutate(experiment = "EXP03")
+  mutate(experiment = "EXP2")
 
 
 X_m <- bind_rows(X02_m, X03_m)
@@ -225,6 +225,7 @@ glycan_colours <- c(
   "Agalactosylation"       = "#E69F00",
   "Galactosylation"        = "#56B4E9",
   "Sialylation"            = "#009E73",
+  "Sialylation (A2)" = "#6D5A9C",
   "Bisection"              = "#F0E442",
   "High Mannose"           = "#0072B2",
   "Antennary fucosylation" = "#D55E00",
@@ -236,7 +237,7 @@ glycan_colours <- c(
 hc_shapes <- c(Y = 21, YA = 22, YF = 23, YI = 24)
 
 pdf("./output/figures/03-EXP02_vs_EXP03_traits.pdf", width = 12, height = 14)
-p <- ggplot(X_mw, aes(x = EXP02, y = EXP03))
+p <- ggplot(X_mw, aes(x = EXP1, y = EXP2))
 
 print(
   p 
@@ -280,8 +281,8 @@ print(
       )
     )
     + labs(
-      x = "Mean normalised area EXP02 (%)",
-      y = "Mean normalised area EXP03 (%)"
+      x = "Mean normalised area EXP 1 (%)",
+      y = "Mean normalised area EXP 2 (%)"
     )
       + theme_bw(base_size = 11) 
       + theme(legend.key = element_rect(fill = NA)) 
@@ -296,7 +297,7 @@ dev.off()
 pdf("./output/figures/03-EXP02_vs_EXP03_traits_per_HC.pdf", width = 12, height = 12)
 
 
-p <- ggplot(X_mw, aes(x = EXP02, y = EXP03))
+p <- ggplot(X_mw, aes(x = EXP1, y = EXP2))
 
 print(
   p 
@@ -342,8 +343,8 @@ print(
   #   )
   # )
   + labs(
-    x = "Mean normalised area EXP02 (%)",
-    y = "Mean normalised area EXP03 (%)"
+    x = "Mean normalised area EXP 1 (%)",
+    y = "Mean normalised area EXP 2 (%)"
   )
   + theme_bw(base_size = 11) 
   #+ theme(legend.key = element_rect(fill = NA)) 

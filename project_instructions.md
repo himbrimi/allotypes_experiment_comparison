@@ -1,5 +1,9 @@
 # IgG Glycome Sequence Study — Project Briefing
 
+## ⚠️ Action required
+
+- [ ] **Verify H6N3F1S1 EXP02 charge-state integration** — 3+ ions absent in EXP02 raw CSV but present in EXP03. No documented rationale found in audit table. For large sialylated structures, 3+ is typically the dominant ion. Origin of the absence (non-detection, instrument settings, or data processing artefact) is unknown. **Raw EXP02 data must be inspected before S and H inter-experiment comparisons can be interpreted.**
+
 ## Overview
 
 Impact of antibody heavy chain (HC) and light chain (LC) amino acid sequence on IgG glycosylation profiles. Eight antibodies (4 HC × 2 LC, full factorial) expressed in the same cell culture system; analysed by LC-MS of tryptic glycopeptides. Data: % normalised areas per glycoform per sample.
@@ -89,12 +93,17 @@ Biological conclusions drawn only from effects significant (q < 0.05) in both ex
 | B | Bisection | H3N5F1 + H4N5F1 + H5N5F1 | — |
 | AntennaryF | Antennary fucosylation | H5N4F2 | — |
 | H | Hybrid | H5N3F1 + H6N3F1 + H6N3F1S1 | ⚠ See charge-state bias note |
+| S_A2 | Monoantennary sialylation | H4N4F1S1 + H5N4F1S1 + H5N4F1S2 | ⚠ Same charge-state bias as S; H5N4F1S1 absent for YA in both experiments |
+
+S_A2 is an exploratory trait motivated by elevated sialylation in YI driven by monoantennary sialylated structures. Computed in `01-derived_traits_exp02_v2.R` and `01-derived_traits_exp03_v2.R` (kept separate from the main pipeline for now).
 
 Fucosylation dropped: all non-HM structures carry core fucose → perfectly collinear with 100 − M.
 
 **Charge-state bias (verified 2026-06-17):**
 - **H5N4F1S1** — EXP02: 2+ and 3+ (Y, YF, YI); EXP03: 2+ only. EXP02 S slightly higher for Y, YF, YI.
 - **H6N3F1S1** — EXP02: 2+ only; EXP03: 2+ and 3+ (all HC). EXP03 S and H slightly higher for all HC types.
+
+> ⚠️ **H6N3F1S1 EXP02 — origin of 3+ absence unknown:** 3+ ions are absent from the EXP02 raw CSV with no documented rationale in the audit table. For large sialylated structures, 3+ is typically the dominant ion. Whether this reflects genuine non-detection, instrument settings, or a data processing artefact is unclear. Raw EXP02 data must be inspected before S and H inter-experiment comparisons can be interpreted.
 - The two S biases partially offset but do not cancel (different HC types affected). Inter-experiment comparison of S and H requires this caveat. All other traits unaffected.
 
 ---

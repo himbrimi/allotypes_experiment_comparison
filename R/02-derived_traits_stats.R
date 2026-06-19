@@ -22,7 +22,7 @@ library(emmeans)
 # Load data
 # ------------------------------------------------------------------------------
 
-load("./data/processed/01-X-EXP03.Rdata")
+load("./data/processed/01-X-EXP03_v2.Rdata")
 
 
 
@@ -31,12 +31,12 @@ load("./data/processed/01-X-EXP03.Rdata")
 # ------------------------------------------------------------------------------
 
 X_dt <- X %>%
-  filter(glycan %in% c("A1", "G0", "G", "S","M","B", "AntennaryF", "H"))
+  filter(glycan %in% c("A1", "G0", "G", "S", "S_A2", "M","B", "AntennaryF", "H"))
 
 
 
-X_dt$glycan <- factor(X_dt$glycan, levels =c( "G0", "G", "S","B","M", "AntennaryF", "A1","H"),
-                      labels = c("Agalactosylation", "Galactosylation", "Sialylation",  "Bisection", 
+X_dt$glycan <- factor(X_dt$glycan, levels =c( "G0", "G", "S", "S_A2", "B","M", "AntennaryF", "A1","H"),
+                      labels = c("Agalactosylation", "Galactosylation", "Sialylation",  "Sialylation (A2)", "Bisection", 
                                  "High Mannose", "Antennary fucosylation", "Monoantennary", "Hybrid"))
 
 ## wo standards
@@ -123,7 +123,7 @@ anova_results$p_adj <- p.adjust(anova_results$Pr, method = 'fdr' )
 anova_results <- anova_results %>%
   mutate(sign = ifelse(p_adj < 0.05, "sign", "no"))
 
-write.csv(anova_results, file= "./output/tables/02-EXP03-art-anova.csv")
+write.csv(anova_results, file= "./output/tables/02-EXP03-art-anova_S2.csv")
 
 
 
@@ -275,7 +275,7 @@ print(
 # Save outputs
 # ------------------------------------------------------------------------------
 
-save(X_dt, file="./data/processed/02-X_dt_EXP03.RData")
+save(X_dt, file="./data/processed/02-X_dt_EXP03_S_A2.RData")
 
 ### calculate averages
 

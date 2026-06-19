@@ -12,17 +12,17 @@ library(tidyverse)
 library(pheatmap)
 
 ## load data
-load("./data/processed/02-X_dt_EXP02.Rdata") # loads traits_exp02
+load("./data/processed/02-X_dt_EXP02_S_A2.Rdata") # loads traits_exp02
 traits_exp02 <- X_dt
 
-load("./data/processed/02-X_dt_EXP03.RData") # loads traits_exp03
+load("./data/processed/02-X_dt_EXP03_S_A2.RData") # loads traits_exp03
 traits_exp03 <- X_dt
 
 
 
 # ── 0. Config ────────────────────────────────────────────────────────────────
 
-TRAITS <- c("Agalactosylation", "Galactosylation", "Sialylation", "High Mannose", "Bisection", "Antennary fucosylation",
+TRAITS <- c("Agalactosylation", "Galactosylation", "Sialylation", "Sialylation (A2)", "High Mannose", "Bisection", "Antennary fucosylation",
             "Monoantennary", "Hybrid")
 
 TRAIT_LABELS <- setNames(TRAITS, TRAITS)

@@ -2,6 +2,10 @@
 **Project:** 2024_IgG_glycans_with_Anika  
 **Analysis folder:** 20260513_EXP02_vs_EXP03
 
+## ⚠️ Action required
+
+- [ ] **Verify H6N3F1S1 EXP02 charge-state integration** — 3+ ions absent in EXP02 raw CSV but present in EXP03. No documented rationale found in audit table. For large sialylated structures, 3+ is typically the dominant ion. Origin of the absence (non-detection, instrument settings, or data processing artefact) is unknown. **Raw EXP02 data must be inspected before S and H inter-experiment comparisons can be interpreted.**
+
 ## Overview
 
 This project investigates how antibody heavy chain (HC) and light chain (LC) amino acid sequence influences IgG glycosylation profiles. Eight antibodies (4 HC × 2 LC, full factorial design) were expressed in the same cell culture system and analysed by LC-MS of tryptic glycopeptides. Data are expressed as % normalised areas per glycoform per sample.
@@ -60,23 +64,28 @@ HC types map to analysed glycopeptides as follows: Y → IgGI1, YA → IgGIA1, Y
 │   │   ├── 00-QC-EXP02.pdf                      # QC plot EXP02
 │   │   ├── 00-QC-EXP03.pdf                      # QC plot EXP03
 │   │   ├── 01-EXP02-dt.pdf                      # Derived trait distributions EXP02
+│   │   ├── 01-EXP02-dt-S_A2.pdf                 # Derived trait distributions EXP02 incl. S_A2
 │   │   ├── 01-EXP03-dt.pdf                      # Derived trait distributions EXP03
+│   │   ├── 01-EXP03_dt_S_A2.pdf                 # Derived trait distributions EXP03 incl. S_A2
 │   │   ├── 02-EXP02_dt_bw.pdf                   # Trait QC plot EXP02, b/w
+│   │   ├── 02-DT_bw_S2.pdf                      # Trait QC plot EXP02 incl. S_A2, b/w
 │   │   ├── 02-EXP02-HC_trajectories.pdf         # HC marginal emmeans EXP02
 │   │   ├── 02-EXP02-LC_effect.pdf               # LC marginal emmeans EXP02
 │   │   ├── 02-EXP02-LC_effect_per_HC.pdf        # HC×LC cell means EXP02
 │   │   ├── 02-EXP02-LC_slope_graph.pdf          # HC×LC slope graph EXP02
 │   │   ├── 02-EXP03_dt_bw.pdf                   # Trait QC plot EXP03, b/w
+│   │   ├── 02-EXP03_DT_bw_S2.pdf               # Trait QC plot EXP03 incl. S_A2, b/w
 │   │   ├── 02-EXP03-HC_trajectories.pdf         # HC marginal emmeans EXP03
 │   │   ├── 02-EXP03-LC_effect.pdf               # LC marginal emmeans EXP03
 │   │   ├── 02-EXP03-LC_effect_per_HC.pdf        # HC×LC cell means EXP03
 │   │   ├── 02-EXP03-LC_slope_graph.pdf          # HC×LC slope graph EXP03
-│   │   ├── 03-combined-HC-effect.pdf            # HC marginal emmeans, both experiments
-│   │   ├── 03-combined-LC-effect.pdf            # LC marginal emmeans, both experiments
-│   │   ├── 03-EXP02_vs_EXP03_traits.pdf         # EXP02 vs EXP03 scatter, all traits
-│   │   ├── 03-EXP02_vs_EXP03_traits_per_HC.pdf  # EXP02 vs EXP03 scatter, faceted by HC
+│   │   ├── 03-combined-HC-effect.pdf            # HC marginal emmeans, both experiments (updated 2026-06-19)
+│   │   ├── 03-combined-LC-effect.pdf            # LC marginal emmeans, both experiments (updated 2026-06-19)
+│   │   ├── 03-EXP02_vs_EXP03_traits_per_HC.pdf  # EXP02 vs EXP03 scatter, faceted by HC (updated 2026-06-19)
 │   │   ├── 04_heatmap_exp02.pdf                 # Derived trait z-score heatmap EXP02
 │   │   ├── 04_heatmap_exp03.pdf                 # Derived trait z-score heatmap EXP03
+│   │   ├── 04_02_heatmap_exp02.pdf              # Derived trait z-score heatmap EXP02 incl. S_A2
+│   │   ├── 04_02_heatmap_exp03.pdf              # Derived trait z-score heatmap EXP03 incl. S_A2
 │   │   ├── 05_glycan_heatmap_exp02.pdf          # Raw glycan heatmap EXP02
 │   │   └── 05_glycan_heatmap_exp03.pdf          # Raw glycan heatmap EXP03
 │   └── tables/
@@ -90,7 +99,9 @@ HC types map to analysed glycopeptides as follows: Y → IgGI1, YA → IgGIA1, Y
     ├── 00-normalise_EXP02.R                     # Normalisation, QC, unification EXP02
     ├── 00-normalise_EXP03.R                     # Normalisation, QC, unification EXP03
     ├── 01-derived_traits_exp02.R                # Trait derivation EXP02
+    ├── 01-derived_traits_exp02_v2.R             # Trait derivation EXP02 incl. S_A2 (exploratory)
     ├── 01-derived_traits_exp03.R                # Trait derivation EXP03
+    ├── 01-derived_traits_exp03_v2.R             # Trait derivation EXP03 incl. S_A2 (exploratory)
     ├── 02-derived_traits_stats.R                # ART-ANOVA, BH-FDR, emmeans
     ├── 03-combined_effects_plot.R               # Combined emmeans and scatter plots
     ├── 04_trait_heatmap.R                       # Derived trait heatmap
@@ -167,6 +178,8 @@ Two glycoforms contributing to S and H are integrated with different charge stat
 
 - **H5N4F1S1** — EXP02: 2+ and 3+ (Y, YF, YI); EXP03: 2+ only (Y, YF, YI). EXP02 S values are slightly higher for these three HC types due to the additional 3+ contribution.
 - **H6N3F1S1** — EXP02: 2+ only (all HC types); EXP03: 2+ and 3+ (all HC types). EXP03 S and H values are slightly higher for all HC types due to the additional 3+ contribution.
+
+> ⚠️ **H6N3F1S1 EXP02 — origin of 3+ absence unknown:** 3+ ions are absent from the EXP02 raw CSV with no documented rationale in the audit table. For large sialylated structures, 3+ is typically the dominant ion. Whether this reflects genuine non-detection, instrument settings, or a data processing artefact is unclear. Raw EXP02 data must be inspected before S and H inter-experiment comparisons can be interpreted.
 
 These two biases partially offset each other in the S trait but do not cancel cleanly (they affect different HC types). Inter-experiment comparisons of S and H should be interpreted with this caveat. All other traits are unaffected by charge-state differences.
 
